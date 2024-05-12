@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 3.13)
 project(hello 
 	VERSION 1.0
 	DESCRIPTION "Very nice project"
-	LANGUAGES C CXX)
+	LANGUAGES ASM C CXX)
 
 # Target definition
 set(CMAKE_SYSTEM_NAME  Generic)
@@ -49,7 +49,7 @@ else()
 endif()
 
 set(BUILD_BINARY "${CMAKE_PROJECT_NAME}${BINARY_EXT}")
-
+	
 # Perform compiler test with static library
 #set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
@@ -63,10 +63,10 @@ set(CMAKE_C_FLAGS   "${OBJECT_GEN_FLAGS} -std=gnu99 " CACHE INTERNAL "C Compiler
 set(CMAKE_CXX_FLAGS "${OBJECT_GEN_FLAGS} -std=c++11 " CACHE INTERNAL "C++ Compiler options")
 set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp " CACHE INTERNAL "ASM Compiler options")
 
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections --specs=nano.specs --specs=nosys.specs -mtune=cortex-m0 -mthumb -march=armv6-m -mabi=aapcs -Wl,-Map=${CMAKE_PROJECT_NAME}.map" CACHE INTERNAL "Linker options")
+set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/lds/gcc_arm_64k.ld -Wl,--gc-sections -nostartfiles -mtune=cortex-m0 -mthumb -march=armv6-m -mabi=aapcs -Wl,-Map=${CMAKE_PROJECT_NAME}.map" CACHE INTERNAL "Linker options")
 
 # Set debug/release build configuration Options
-set(CMAKE_C_FLAGS_DEBUG "-Og -g" CACHE INTERNAL "C Compiler options for debug build type")
+set(CMAKE_C_FLAGS_DEBUG "-Og -g -fdiagnostics-color" CACHE INTERNAL "C Compiler options for debug build type")
 set(CMAKE_CXX_FLAGS_DEBUG "-Og -g" CACHE INTERNAL "C++ Compiler options for debug build type")
 set(CMAKE_ASM_FLAGS_DEBUG "-g" CACHE INTERNAL "ASM Compiler options for debug build type")
 set(CMAKE_EXE_LINKER_FLAGS_DEBUG "" CACHE INTERNAL "Linker options for debug build type")
@@ -81,6 +81,7 @@ set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-flto" CACHE INTERNAL "Linker options for re
 set(CMAKE_C_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-gcc${TOOLCHAIN_EXT} CACHE INTERNAL "C Compiler")
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-g++${TOOLCHAIN_EXT} CACHE INTERNAL "C++ Compiler")
 set(CMAKE_ASM_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-gcc${TOOLCHAIN_EXT} CACHE INTERNAL "ASM Compiler")
+set(CMAKE_SIZE_UTIL ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-size${TOOLCHAIN_EXT} CACHE INTERNAL "size tool")
 
 set(CMAKE_FIND_ROOT_PATH ${TOOLCHAIN_PREFIX}/${${TOOLCHAIN}} ${CMAKE_PREFIX_PATH})
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
@@ -100,8 +101,12 @@ add_subdirectory(thirdparty/rtos)
 #add_subdirectory(srv) 
 #add_subdirectory(app) 
 
+file(GLOB SOURCES_ASM asm/*.s)
+set(SOURCES ${SOURCES_ASM})
+
 set(PATH_INCLUDES inc)
-file(GLOB SOURCES src/*.c)
+file(GLOB SOURCES_MAIN src/*.c)
+list (APPEND SOURCES ${SOURCES_MAIN})
 
 file(GLOB SOURCES_drv_hw ${CMAKE_CURRENT_SOURCE_DIR}/drv/hw/src/*.c)
 file(GLOB SOURCES_drv_pcemu ${CMAKE_CURRENT_SOURCE_DIR}/drv/pcemu/src/*.c)
@@ -136,4 +141,9 @@ target_link_libraries(${BUILD_BINARY}
 	std_driver
 	rtos
 )
+
+#####
+
+add_custom_command(TARGET ${BUILD_BINARY} POST_BUILD
+	COMMAND ${CMAKE_SIZE_UTIL} --format=berkeley ${BUILD_BINARY})
 
