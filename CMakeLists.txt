@@ -57,13 +57,13 @@ option(BUILD_PCEMU "Build PC Emulation" OFF)
 message(STATUS "The value of BUILD_PCEMU is: ${BUILD_PCEMU}")
 
 # Set compiler/linker flags
-set(OBJECT_GEN_FLAGS "-O0 -mthumb -fno-builtin -Wall -ffunction-sections -fdata-sections -fomit-frame-pointer -mabi=aapcs")
+set(OBJECT_GEN_FLAGS "-O0 -mtune=cortex-m0 -mthumb -march=armv6-m -fno-builtin -Wall -ffunction-sections -fdata-sections -fomit-frame-pointer -mabi=aapcs")
 
 set(CMAKE_C_FLAGS   "${OBJECT_GEN_FLAGS} -std=gnu99 " CACHE INTERNAL "C Compiler options")
 set(CMAKE_CXX_FLAGS "${OBJECT_GEN_FLAGS} -std=c++11 " CACHE INTERNAL "C++ Compiler options")
 set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp " CACHE INTERNAL "ASM Compiler options")
 
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections --specs=nano.specs --specs=nosys.specs -mthumb -mabi=aapcs -Wl,-Map=${CMAKE_PROJECT_NAME}.map" CACHE INTERNAL "Linker options")
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections --specs=nano.specs --specs=nosys.specs -mtune=cortex-m0 -mthumb -march=armv6-m -mabi=aapcs -Wl,-Map=${CMAKE_PROJECT_NAME}.map" CACHE INTERNAL "Linker options")
 
 # Set debug/release build configuration Options
 set(CMAKE_C_FLAGS_DEBUG "-Og -g" CACHE INTERNAL "C Compiler options for debug build type")
@@ -89,9 +89,9 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 # Add sub directories
+add_subdirectory(thirdparty/m032) 
+add_subdirectory(thirdparty/std_driver) 
 add_subdirectory(thirdparty/rtos) 
-add_subdirectory(thirdparty/vendor1) 
-add_subdirectory(thirdparty/vendor2) 
 
 #message(STATUS "The value of rtos_SOURCES is: ${rtos}")
 
@@ -132,8 +132,8 @@ target_include_directories(${BUILD_BINARY}
 	)
 
 target_link_libraries(${BUILD_BINARY}
-	vendor1
-	vendor2
+	m032
+	std_driver
 	rtos
 )
 
