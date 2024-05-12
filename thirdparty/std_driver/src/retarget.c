@@ -540,6 +540,8 @@ int fputc(int ch, FILE *stream)
 
 #else
 
+// #error "Does this print 1 ???"
+
 int _write(int fd, char *ptr, int len)
 {
     int i = len;
