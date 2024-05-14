@@ -62,13 +62,13 @@ option(BUILD_PCEMU "Build PC Emulation" OFF)
 message(STATUS "The value of BUILD_PCEMU is: ${BUILD_PCEMU}")
 
 # Set compiler/linker flags
-set(OBJECT_GEN_FLAGS "-O0 -mtune=cortex-m0 -mthumb -march=armv6-m -fno-builtin -Wall -masm-syntax-unified -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -mabi=aapcs")
+set(OBJECT_GEN_FLAGS "-O0 -mcpu=cortex-m0 -mthumb -masm-syntax-unified -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections")
 
 set(CMAKE_C_FLAGS   "${OBJECT_GEN_FLAGS} -std=gnu11 " CACHE INTERNAL "C Compiler options")
 set(CMAKE_CXX_FLAGS "${OBJECT_GEN_FLAGS} -std=c++11 " CACHE INTERNAL "C++ Compiler options")
-set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections" CACHE INTERNAL "ASM Compiler options")
+set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp -mcpu=cortex-m0 -mthumb -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections" CACHE INTERNAL "ASM Compiler options")
 
-set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/lds/gcc_arm_64k.ld -Wl,--gc-sections --specs=nano.specs -mtune=cortex-m0 -mthumb -march=armv6-m -mabi=aapcs -Wl,-Map=${CMAKE_PROJECT_NAME}.map" CACHE INTERNAL "Linker options")
+set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/lds/gcc_arm_64k.ld -Wl,--gc-sections --specs=nano.specs -mcpu=cortex-m0 -mthumb -fmessage-length=0 -fsigned-char -Wl,-Map=${CMAKE_PROJECT_NAME}.map" CACHE INTERNAL "Linker options")
 
 # Set debug/release build configuration Options
 set(CMAKE_C_FLAGS_DEBUG "-Og -g -fdiagnostics-color" CACHE INTERNAL "C Compiler options for debug build type")
@@ -143,6 +143,8 @@ target_include_directories(${BUILD_BINARY}
 	)
 
 target_link_libraries(${BUILD_BINARY}
+	gcc
+	c
 	m032
 	std_driver
 	rtos

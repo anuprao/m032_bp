@@ -78,6 +78,9 @@ void SystemInit(void)
 {
     /* Unlock protected registers */
     SYS_UnlockReg();
+    
+    // Disable WDT
+    WDT->CTL &= ~(WDT_CTL_INTEN_Msk | WDT_CTL_RSTF_Msk | WDT_CTL_IF_Msk | WDT_CTL_WKF_Msk);
 
     /* Set HXTGain Level dependend on HXT Frequency */
     CLK->PWRCTL = CLK->PWRCTL & ~CLK_PWRCTL_HXTGAIN_Msk;

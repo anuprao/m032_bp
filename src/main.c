@@ -22,6 +22,7 @@ volatile int32_t g_bWait         = TRUE;
 /* Define functions prototype                                                                              */
 /*---------------------------------------------------------------------------------------------------------*/
 int32_t main(void);
+//void main(void);
 void UART_TEST_HANDLE(void);
 void UART_FunctionTest(void);
 
@@ -108,7 +109,7 @@ int32_t main(void)
 
     while(1);
 
-	return 0;
+    return 0;
 }
 
 /*---------------------------------------------------------------------------------------------------------*/

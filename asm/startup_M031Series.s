@@ -11,6 +11,8 @@
 
 	.syntax	unified
 	.arch	armv6-m
+	
+	.extern main
 
 	.section .stack
 	.align	3
@@ -266,13 +268,13 @@ Reset_Handler:
 	bl	SystemInit
 #endif
 	
-//#ifndef __START
-//#define __START _start
-//#endif
-//	bl	__START
+#ifndef __START
+#define __START _start
+#endif
+	bl	__START
 
-	 bl  main
-     bx  lr
+	 //bl  main
+	 //bx  lr
 
 	.pool
 	.size	Reset_Handler, . - Reset_Handler
